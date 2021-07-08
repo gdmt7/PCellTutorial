@@ -19,4 +19,4 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
   * **load**("./EXAMPLE/pcellMain.il")
  
 * After loading the code, use the function created to to run the script: 
- * **init**(libName attachLibName)
+  * **init**(libName attachLibName)
