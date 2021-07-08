@@ -11,4 +11,5 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
 
 # How to run the Scripts:
 
-1) run shell: composer install
+1) In the Command Interpreter Window (CIW) of Cadence Virtuoso:
+* XPTO
