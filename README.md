@@ -29,4 +29,4 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
 * The work developed in this thesis used commercial EDA tools, without modifications in the standard design flow or in the internal models used by the tool, as well as in the PDK files used. 
 * It is important to highlight and clarify that PCell's are DRC and LVS clean, remembering that these PCell's were developed for UMC 130 nm technology.
 * If you intend to implement these scripts for another technology, you should study and understand the **getTechInfo** function developed, this contains all the information related to the design layout rules of the PDK.
-  * Esta 
+  * The function **getTechInfo** is in the file **ELTpcell.il** both on the Octagonal and Recangular paths.
