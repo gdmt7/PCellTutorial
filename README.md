@@ -20,3 +20,6 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
  
 * After loading the code, in the Cadence CIW call the function **init()** to run the script: 
   * **init**(libName attachLibName)
+    * This function
+
+* XPTO
