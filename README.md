@@ -13,8 +13,7 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
 
 * Copies the PCell folder you intend to use to the working directory in Cadence.
   * ```console
-foo@bar:~$ whoami
-foo
-```
+    foo@bar:~$ whoami
+    ```
 * In the Command Interpreter Window (CIW) of Cadence Virtuoso:  
   * **load**("./SKILL/EXAMPLE/pcellMain.il")
