@@ -17,3 +17,6 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
     ```
 * In the Command Interpreter Window (CIW) of Cadence Virtuoso:  
   * **load**("./EXAMPLE/pcellMain.il")
+ 
+* After loading the code, use the function created to to run the script: 
+ * **init**(libName attachLibName)
