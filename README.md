@@ -23,3 +23,5 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
     * This function creates a library with the name **libName** and attaches the technology file **attachLibName** to the **libName** library. The **attachLibName** refers to the technology on which PCell is intended to be developed, in this case UMC 130 nm technology. 
 
 * If you need to run the script again, you just need to run the **load** command in the CIW, bearing in mind that the library has already been created by the **init()** function.
+
+# Assumptions
