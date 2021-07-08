@@ -11,6 +11,6 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
 
 # How to run the Scripts:
 
-* Copies the PCell folder you intend to use to the working directory in cadence.
+* Copies the PCell folder you intend to use to the working directory in Cadence.
 * In the Command Interpreter Window (CIW) of Cadence Virtuoso:  
   * **load**("./SKILL/EXAMPLE/pcellMain.il")
