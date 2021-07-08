@@ -16,4 +16,4 @@ Using a commercial technology of 130 nm from UMC the main goal is to develop an 
     foo@bar:~$ cp [option] source destination
     ```
 * In the Command Interpreter Window (CIW) of Cadence Virtuoso:  
-  * **load**("./SKILL/EXAMPLE/pcellMain.il")
+  * **load**("./EXAMPLE/pcellMain.il")
