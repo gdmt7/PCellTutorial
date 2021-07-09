@@ -12,10 +12,7 @@ Using a commercial technology of 130 nm from United Microelectronics Corporation
 
 # How to run the Scripts:
 
-* Copy the PCell folder you intend to use to your working directory in Cadence.
-  * ```console
-    foo@bar:~$ cp -r dir1 dir2
-    ```
+* Copy the PCell folder you intend to use to your working directory in Cadence Virtuoso.
 * In the Command Interpreter Window (CIW) of Cadence Virtuoso:  
   * **load**("./EXAMPLE/pcellMain.il")
  
