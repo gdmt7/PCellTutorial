@@ -14,7 +14,7 @@ Using a commercial technology of 130 nm from United Microelectronics Corporation
 
 * Copy the PCell folder you intend to use to your working directory in Cadence.
   * ```console
-    foo@bar:~$ cp -R source destination
+    foo@bar:~$ cp -r dir1 dir2
     ```
 * In the Command Interpreter Window (CIW) of Cadence Virtuoso:  
   * **load**("./EXAMPLE/pcellMain.il")
