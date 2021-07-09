@@ -1,8 +1,8 @@
 # Introduction
 
-This repository corresponds to the work developed in a master's thesis, the code developed can be used as a tutorial in order to develop other types of PCell for different technologies.
+This repository corresponds to the work developed in a master's thesis, the code developed can be used as a tutorial in order to develop other types of Parametrized Cell (PCell) for different technologies.
 To mitigate the impact of radiation exposure in microelectronics circuits, multiple methods have emerged in order to be studied, Radiation Hardened by Design (RHbD) was the choosen method, basically this technique rely in the modification of the transistor layout geometry.
-Using a commercial technology of 130 nm from United Microelectronics Corporation (UMC) the main goal is to develop an Enclosed Layout Transistor (ELT) library with an NMOS and PMOS Parametrized Cell (PCell), which can be used to design any circuit layout using radiation tolerant transistors. In this work two different types of layout for radiation tolerant were developed, presented as a rectangular and a octagonal PCell.
+Using a commercial technology of 130 nm from United Microelectronics Corporation (UMC) the main goal is to develop an Enclosed Layout Transistor (ELT) library with an NMOS and PMOS PCell, which can be used to design any circuit layout using radiation tolerant transistors. In this work two different types of layout for radiation tolerant were developed, presented as a rectangular and a octagonal PCell.
 
 # Tools and language used for the development of PCell:
 
