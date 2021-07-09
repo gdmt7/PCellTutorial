@@ -14,7 +14,7 @@ Using a commercial technology of 130 nm from United Microelectronics Corporation
 
 * Copy the PCell folder you intend to use to your working directory in Cadence Virtuoso.
 * In the Command Interpreter Window (CIW) of Cadence Virtuoso:  
-  * **load**("./EXAMPLE/pcellMain.il")
+  * **load**("./example/pcellMain.il")
  
 * After loading the code, in the Cadence CIW call the function **init()** to run the script: 
   * **init**(libName attachLibName)
