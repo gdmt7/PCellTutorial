@@ -65,7 +65,7 @@ let( (cellId cdfId libName cellName)
       ?prompt   "d"
       ?storeDefault "yes"
       ?units   "lengthMetric"
-      ?defValue "0.7u"
+      ?defValue "0.745u"
       ?type     "string"
       ?display  "t"
       ?editable "nil"
@@ -111,7 +111,7 @@ let( (cellId cdfId libName cellName)
     ;; Simulator Information
     cdfId->simInfo = list( nil )
     cdfId->simInfo->auCdl = '( nil
-      netlistProcedure  ansCdlSubcktCallExtended ;ansCdlCompPrim
+      netlistProcedure  ansCdlSubcktCallExtended
       instParameters    (l w d dl)
       termOrder         (D G S B)
       propMapping       nil

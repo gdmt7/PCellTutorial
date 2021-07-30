@@ -17,22 +17,10 @@ CEll    = "ELTpcell"
 
 load("./SKILL/OCTAGONAL/pcellUtils.il")
 
-
-/*
- Sum numbers in a vector.
- 
- This sum is the arithmetic sum, not some other kind of sum that only
- mathematicians have heard of.
- 
- @param values Container whose values are summed.
- @return sum of `values`, or 0.0 if `values` is empty.
- */
-
 procedure(getTechInfo(cvId)
   let( (pcTechFile)
     pcTechFile = techGetTechFile(cvId)
     
-    ;PO1_minWidth = techGetSpacingRule(pcTechFile "minWidth" "PO1")
     ME1_minSpacing = techGetSpacingRule(pcTechFile "minSpacing" "ME1")
     ME2_minSpacing = techGetSpacingRule(pcTechFile "minSpacing" "ME2")
     CT_minSpacing = techGetSpacingRule(pcTechFile "minSpacing" "CONT")
@@ -60,95 +48,59 @@ procedure(getTechInfo(cvId)
   )
 )
 
-/*
- Sum numbers in a vector.
- 
- This sum is the arithmetic sum, not some other kind of sum that only
- mathematicians have heard of.
- 
- @param values Container whose values are summed.
- @return sum of `values`, or 0.0 if `values` is empty.
- */
-
-procedure(createPolygon(cv pin layer type dint cl sw l d)
+procedure(createPolygon(cv pin layer type d sl l dl)
   let((x y pinFig square_sides xPO1DIFF_Spacing)
     x = 0 
     y = 0
+    cl = snapGrid(sqrt(d*d/2) grid)
 
     if( layer == "DIFF" then
       xPO1DIFF_Spacing = 0.24
-      dbCreatePolygon(cv list(layer type) list((x-d-xPO1DIFF_Spacing:y+l+sw) (x+dint+d+xPO1DIFF_Spacing:y+l+sw) (x+dint+l+cl+sw:y-cl+d+xPO1DIFF_Spacing) (x+dint+l+cl+sw:y-dint-cl-d-xPO1DIFF_Spacing) (x+dint+d+xPO1DIFF_Spacing:y-dint-2*cl-l-sw) (x-d-xPO1DIFF_Spacing:y-dint-2*cl-l-sw) (x-cl-l-sw:y-dint-cl-d-xPO1DIFF_Spacing) (x-cl-l-sw:y-cl+d+xPO1DIFF_Spacing)))
+      dbCreatePolygon(cv list(layer type) list((x-dl-xPO1DIFF_Spacing:y+l+sl) (x+d+dl+xPO1DIFF_Spacing:y+l+sl) (x+d+l+cl+sl:y-cl+dl+xPO1DIFF_Spacing) (x+d+l+cl+sl:y-d-cl-dl-xPO1DIFF_Spacing) (x+d+dl+xPO1DIFF_Spacing:y-d-2*cl-l-sl) (x-dl-xPO1DIFF_Spacing:y-d-2*cl-l-sl) (x-cl-l-sl:y-d-cl-dl-xPO1DIFF_Spacing) (x-cl-l-sl:y-cl+dl+xPO1DIFF_Spacing)))
     )
     if( pin == "D" then
-      pinFig = dbCreatePolygon(cv list(layer type) list((x+dint-0.15:y-sw) (x+dint+cl-sw:y-cl-0.15) (x+dint+cl-sw:y-cl-dint+0.15) (x+dint-0.15:y-dint-2*cl+sw) (x+0.15:y-dint-2*cl+sw) (x-cl+sw:y-dint-cl+0.15) (x-cl+sw:y-cl-0.15) 
-      (x+0.15:y-sw) (x+dint-0.15:y-sw) (x+dint-0.15:y) (x:y) (x-cl:y-cl) (x-cl:y-cl-dint) (x:y-2*cl-dint) (x+dint:y-2*cl-dint) (x+dint:y-2*cl-dint) (x+dint+cl:y-dint-cl) (x+dint+cl:y-cl) (x+dint:y) (x+dint-0.15:y)))
+      pinFig = dbCreatePolygon(cv list(layer type) list((x+d-0.15:y-sl) (x+d+cl-sl:y-cl-0.15) (x+d+cl-sl:y-cl-d+0.15) (x+d-0.15:y-d-2*cl+sl) (x+0.15:y-d-2*cl+sl) (x-cl+sl:y-d-cl+0.15) (x-cl+sl:y-cl-0.15) 
+      (x+0.15:y-sl) (x+d-0.15:y-sl) (x+d-0.15:y) (x:y) (x-cl:y-cl) (x-cl:y-cl-d) (x:y-2*cl-d) (x+d:y-2*cl-d) (x+d:y-2*cl-d) (x+d+cl:y-d-cl) (x+d+cl:y-cl) (x+d:y) (x+d-0.15:y)))
     )
     if( layer == "PO1" || layer == "SDSYM" then
-      dbCreatePolygon(cv list(layer type) list((x-d:y+l) (x:y+l) (x:y) (x-cl:y-cl) (x-cl:y-dint-cl) (x:y-dint-2*cl) (x+dint:y-dint-2*cl) (x+dint+cl:y-dint-cl) (x+dint+cl:y-cl) 
-      (x+dint:y) (x:y) (x:y+l) (x+dint+d:y+l) (x+dint+cl+l:y-cl+d) (x+dint+cl+l:y-dint-cl-d) (x+dint+d:y-dint-2*cl-l) (x-d:y-dint-2*cl-l) (x-cl-l:y-dint-cl-d) (x-cl-l:y-cl+d))) 
+      dbCreatePolygon(cv list(layer type) list((x-dl:y+l) (x:y+l) (x:y) (x-cl:y-cl) (x-cl:y-d-cl) (x:y-d-2*cl) (x+d:y-d-2*cl) (x+d+cl:y-d-cl) (x+d+cl:y-cl) 
+      (x+d:y) (x:y) (x:y+l) (x+d+dl:y+l) (x+d+cl+l:y-cl+dl) (x+d+cl+l:y-d-cl-dl) (x+d+dl:y-d-2*cl-l) (x-dl:y-d-2*cl-l) (x-cl-l:y-d-cl-dl) (x-cl-l:y-cl+dl))) 
     )
     if( pin == "GC" then
       square_sides = 0.1
-      dbCreatePolygon(cv list("PO1" "PO_LVS") list((x-d+0.005:y+l+sw) (x-d+0.16:y+l+sw) (x-d+0.16:y+l+square_sides) (x-d+0.16+square_sides:y+l) (x-d+0.005:y+l)))
-      dbCreatePolygon(cv list(layer type) list((x-d:y+l+sw+PO1DIFF_minSpacing) (x-d+0.16:y+l+sw+PO1DIFF_minSpacing) (x+0.16-d:y+l+square_sides) (x-d+0.16+square_sides:y+l) (x-d:y+l))) 
-      ;gatePinWidth = snapGrid((2*VI1ME1_minSpacing+VI1_minSpacing_3x3+2*VI1_Size) grid)  
-
-      ;(-0.235 1.49) (0.4 1.49) (0.4 1.05) (0.5 0.95) (-0.235 0.95) 
-
-      ;if( l > 0.64 then
-      ;  dbCreatePolygon(cv list("PO1" "PO_LVS") list((x:y) ))
-      ;)
+      dbCreatePolygon(cv list("PO1" "PO_LVS") list((x-dl+0.005:y+l+sl) (x-dl+0.16:y+l+sl) (x-dl+0.16:y+l+square_sides) (x-dl+0.16+square_sides:y+l) (x-dl+0.005:y+l)))
+      dbCreatePolygon(cv list(layer type) list((x-dl:y+l+sl+PO1DIFF_minSpacing) (x-dl+0.16:y+l+sl+PO1DIFF_minSpacing) (x+0.16-dl:y+l+square_sides) (x-dl+0.16+square_sides:y+l) (x-dl:y+l))) 
     )
     if( pin == "S" then
       xPO1DIFF_Spacing = 0.24
-      dbCreatePolygon(cv list(layer type) list((x+dint+d:y+l) (x+dint+cl+l:y-cl+d) (x+dint+cl+l:y-dint-cl-d) (x+dint+d:y-dint-2*cl-l) (x-d:y-dint-2*cl-l) (x-cl-l:y-dint-cl-d) (x-cl-l:y-dint-cl-d) 
-      (x-cl-l:y-cl+d) (x-d:y+l) (x-d:y+l+sw) (x-d-xPO1DIFF_Spacing:y+l+sw) (x-cl-l-sw:y-cl+d+xPO1DIFF_Spacing) (x-cl-l-sw:y-dint-cl-d-xPO1DIFF_Spacing) (x-d-xPO1DIFF_Spacing:y-dint-l-2*cl-sw) (x+dint+d+xPO1DIFF_Spacing:y-dint-l-2*cl-sw) (x+dint+l+cl+sw:y-dint-cl-d-xPO1DIFF_Spacing) 
-      (x+dint+l+cl+sw:y-cl+d+xPO1DIFF_Spacing) (x+dint+d+xPO1DIFF_Spacing:y+l+sw) (x-d:y+l+sw) (x-d:y+l)))
+      dbCreatePolygon(cv list(layer type) list((x+d+dl:y+l) (x+d+cl+l:y-cl+dl) (x+d+cl+l:y-d-cl-dl) (x+d+dl:y-d-2*cl-l) (x-dl:y-d-2*cl-l) (x-cl-l:y-d-cl-dl) (x-cl-l:y-d-cl-dl) 
+      (x-cl-l:y-cl+dl) (x-dl:y+l) (x-dl:y+l+sl) (x-dl-xPO1DIFF_Spacing:y+l+sl) (x-cl-l-sl:y-cl+dl+xPO1DIFF_Spacing) (x-cl-l-sl:y-d-cl-dl-xPO1DIFF_Spacing) (x-dl-xPO1DIFF_Spacing:y-d-l-2*cl-sl) (x+d+dl+xPO1DIFF_Spacing:y-d-l-2*cl-sl) (x+d+l+cl+sl:y-d-cl-dl-xPO1DIFF_Spacing) 
+      (x+d+l+cl+sl:y-cl+dl+xPO1DIFF_Spacing) (x+d+dl+xPO1DIFF_Spacing:y+l+sl) (x-dl:y+l+sl) (x-dl:y+l)))
 
-      pinFig = dbCreatePolygon(cv list(layer type) list((x+dint+d:y+l) (x+dint+cl+l:y-cl+d) (x+dint+cl+l:y-dint-cl-d) (x+dint+d:y-dint-2*cl-l) (x-d:y-dint-2*cl-l) (x-cl-l:y-dint-cl-d) (x-cl-l:y-dint-cl-d) 
-      (x-cl-l:y-cl+d) (x-d:y+l) (x-d:y+l+sw) (x-d-xPO1DIFF_Spacing:y+l+sw) (x-cl-l-sw:y-cl+d+xPO1DIFF_Spacing) (x-cl-l-sw:y-dint-cl-d-xPO1DIFF_Spacing) (x-d-xPO1DIFF_Spacing:y-dint-l-2*cl-sw) (x+dint+d+xPO1DIFF_Spacing:y-dint-l-2*cl-sw) (x+dint+l+cl+sw:y-dint-cl-d-xPO1DIFF_Spacing) 
-      (x+dint+l+cl+sw:y-cl+d+xPO1DIFF_Spacing) (x+dint+d+xPO1DIFF_Spacing:y+l+sw) (x-d:y+l+sw) (x-d:y+l)))
+      pinFig = dbCreatePolygon(cv list(layer type) list((x+d+dl:y+l) (x+d+cl+l:y-cl+dl) (x+d+cl+l:y-d-cl-dl) (x+d+dl:y-d-2*cl-l) (x-dl:y-d-2*cl-l) (x-cl-l:y-d-cl-dl) (x-cl-l:y-d-cl-dl) 
+      (x-cl-l:y-cl+dl) (x-dl:y+l) (x-dl:y+l+sl) (x-dl-xPO1DIFF_Spacing:y+l+sl) (x-cl-l-sl:y-cl+dl+xPO1DIFF_Spacing) (x-cl-l-sl:y-d-cl-dl-xPO1DIFF_Spacing) (x-dl-xPO1DIFF_Spacing:y-d-l-2*cl-sl) (x+d+dl+xPO1DIFF_Spacing:y-d-l-2*cl-sl) (x+d+l+cl+sl:y-d-cl-dl-xPO1DIFF_Spacing) 
+      (x+d+l+cl+sl:y-cl+dl+xPO1DIFF_Spacing) (x+d+dl+xPO1DIFF_Spacing:y+l+sl) (x-dl:y+l+sl) (x-dl:y+l)))
     )
     if( layer == "SYMBOL" then
       xPO1DIFF_Spacing = 0.24
-      pinFig = dbCreatePolygon(cv list(layer type) list((x-d-xPO1DIFF_Spacing:y+l+sw) (x+dint+d+xPO1DIFF_Spacing:y+l+sw) (x+dint+l+cl+sw:y-cl+d+xPO1DIFF_Spacing) (x+dint+l+cl+sw:y-dint-cl-d-xPO1DIFF_Spacing) (x+dint+d+xPO1DIFF_Spacing:y-dint-2*cl-l-sw) (x-d-xPO1DIFF_Spacing:y-dint-2*cl-l-sw) (x-cl-l-sw:y-dint-cl-d-xPO1DIFF_Spacing) (x-cl-l-sw:y-cl+d+xPO1DIFF_Spacing)))
+      pinFig = dbCreatePolygon(cv list(layer type) list((x-dl-xPO1DIFF_Spacing:y+l+sl) (x+d+dl+xPO1DIFF_Spacing:y+l+sl) (x+d+l+cl+sl:y-cl+dl+xPO1DIFF_Spacing) (x+d+l+cl+sl:y-d-cl-dl-xPO1DIFF_Spacing) (x+d+dl+xPO1DIFF_Spacing:y-d-2*cl-l-sl) (x-dl-xPO1DIFF_Spacing:y-d-2*cl-l-sl) (x-cl-l-sl:y-d-cl-dl-xPO1DIFF_Spacing) (x-cl-l-sl:y-cl+dl+xPO1DIFF_Spacing)))
     )
     list(pinFig)
   )
 )
 
-/*
- Sum numbers in a vector.
- 
- This sum is the arithmetic sum, not some other kind of sum that only
- mathematicians have heard of.
- 
- @param values Container whose values are summed.
- @return sum of `values`, or 0.0 if `values` is empty.
- */
-
-procedure(createRect(cv layer type dint cl sw l d)
+procedure(createRect(cv layer type d cl sl l dl)
   let((pinFig gatePinWidth)
     if( layer == "NPLUS" || layer == "PPLUS" then
-      dbCreateRect(cv list(layer type) list((x-cl-l-sw-DIFFNPLUS_minSpacing:y+l+sw+PO1DIFF_minSpacing+VI1_Size+2*VI1ME1_minSpacing) 
-      (x+dint+cl+l+sw+DIFFNPLUS_minSpacing:y-dint-2*cl-l-sw-DIFFNPLUS_minSpacing))) 
+      dbCreateRect(cv list(layer type) list((x-cl-l-sl-DIFFNPLUS_minSpacing:y+l+sl+PO1DIFF_minSpacing+VI1_Size+2*VI1ME1_minSpacing) 
+      (x+d+cl+l+sl+DIFFNPLUS_minSpacing:y-d-2*cl-l-sl-DIFFNPLUS_minSpacing))) 
     else
       gatePinWidth = snapGrid((2*VI1ME1_minSpacing+VI1_minSpacing_3x3+2*VI1_Size) grid)  
-      pinFig = dbCreateRect(cv list(layer type) list((snapGrid((x-d-((gatePinWidth-0.16)/2)) grid):y+l+sw+PO1DIFF_minSpacing) (snapGrid((x-d+0.16+((gatePinWidth-0.16)/2)) grid):y+l+sw+PO1DIFF_minSpacing+(VI1_Size+2*VI1ME1_minSpacing)))) 
+      pinFig = dbCreateRect(cv list(layer type) list((snapGrid((x-dl-((gatePinWidth-0.16)/2)) grid):y+l+sl+PO1DIFF_minSpacing) (snapGrid((x-dl+0.16+((gatePinWidth-0.16)/2)) grid):y+l+sl+PO1DIFF_minSpacing+(VI1_Size+2*VI1ME1_minSpacing)))) 
     )
     list(pinFig)
   )
 )
-
-/*
- Sum numbers in a vector.
- 
- This sum is the arithmetic sum, not some other kind of sum that only
- mathematicians have heard of.
- 
- @param values Container whose values are summed.
- @return sum of `values`, or 0.0 if `values` is empty.
- */
 
 procedure(createPin(cv pin direction pinFig)
   let((G D S B)
@@ -175,17 +127,7 @@ procedure(createPin(cv pin direction pinFig)
   )
 )
 
-/*
- Sum numbers in a vector.
- 
- This sum is the arithmetic sum, not some other kind of sum that only
- mathematicians have heard of.
- 
- @param values Container whose values are summed.
- @return sum of `values`, or 0.0 if `values` is empty.
- */
-
-procedure(createLayout(cv model l dint d sw)
+procedure(createLayout(cv model l d dl sl)
   let((x y mosType alfa pinFigG pinFigD pinFigS pinFigB)
     x = 0
     y = 0
@@ -200,121 +142,97 @@ procedure(createLayout(cv model l dint d sw)
     ;; Convert string to float and multiply for a 
     ;; factor of mega(1e6) to get the value in meters
     l = cdfParseFloatString(l)*1e6
-    dint = cdfParseFloatString(dint)*1e6
     d = cdfParseFloatString(d)*1e6
-    sw = cdfParseFloatString(sw)*1e6
+    dl = cdfParseFloatString(dl)*1e6
+    sl = cdfParseFloatString(sl)*1e6
 
-    cl = snapGrid(sqrt((dint*dint)/2) grid)
+    cl = snapGrid(sqrt(d*d/2) grid)
 
-    ;alfa = (22.5/180)*3.14
-    ;d = tan(alfa)*l
-    ;d = snapGrid((round(d*1000.0)/1000.0) grid)
+    createPolygon(cv "DIFF" "DIFF" "drawing" d sl l dl)
 
-    createPolygon(cv "DIFF" "DIFF" "drawing" dint cl sw l d)
-
-    createPolygon(cv "D" "ME1" "drawing" dint cl sw l d)
-    createPolygon(cv "D" "ME2" "drawing" dint cl sw l d)
-    pinFigD = car(createPolygon(cv "D" "ME3" "drawing" dint cl sw l d))
+    createPolygon(cv "D" "ME1" "drawing" d sl l dl)
+    createPolygon(cv "D" "ME2" "drawing" d sl l dl)
+    pinFigD = car(createPolygon(cv "D" "ME3" "drawing" d sl l dl))
 
     createPin(cv "D" "input" pinFigD)
 
     ;; Creation of enclosed gate in PO1.
-    createPolygon(cv "GC" "PO1" "drawing" dint cl sw l d)
-    ;createPolygon(cv "GC" "SDSYM" "drawing" dint cl sw l d)
+    createPolygon(cv "GC" "PO1" "drawing" d sl l dl)
 
-    dbCreatePolygon(cv list("SDSYM" "drawing") list((x-d:y+l) (x:y+l) (x:y) (x-cl:y-cl) (x-cl:y-dint-cl) (x:y-dint-2*cl) (x+dint:y-dint-2*cl) (x+dint+cl:y-dint-cl) (x+dint+cl:y-cl) 
-    (x+dint:y) (x:y) (x:y+l) (x+dint+d:y+l) (x+dint+cl+l:y-cl+d) (x+dint+cl+l:y-dint-cl-d) (x+dint+d:y-dint-2*cl-l) (x-d:y-dint-2*cl-l) (x-cl-l:y-dint-cl-d) (x-cl-l:y-cl+d))) 
+    dbCreatePolygon(cv list("SDSYM" "drawing") list((x-dl:y+l) (x:y+l) (x:y) (x-cl:y-cl) (x-cl:y-d-cl) (x:y-d-2*cl) (x+d:y-d-2*cl) (x+d+cl:y-d-cl) (x+d+cl:y-cl) 
+    (x+d:y) (x:y) (x:y+l) (x+d+dl:y+l) (x+d+cl+l:y-cl+dl) (x+d+cl+l:y-d-cl-dl) (x+d+dl:y-d-2*cl-l) (x-dl:y-d-2*cl-l) (x-cl-l:y-d-cl-dl) (x-cl-l:y-cl+dl))) 
 
-    pinFigG = car(createRect(cv "ME1" "drawing" dint cl sw l d))
+    pinFigG = car(createRect(cv "ME1" "drawing" d cl sl l dl))
 
     createPin(cv "G" "input" pinFigG)
 
     ;; Creation of gate contact M1 to POLY
-    designGateContacts(cv x y l sw "M1_POLY")
+    designGateContacts(cv x y l sl "M1_POLY")
 
     ;; Creation of gate contact M2 to M1
-    designGateContacts(cv x y l sw "M2_M1")
+    designGateContacts(cv x y l sl "M2_M1")
     
-    createPolygon(cv "S" "ME1" "drawing" dint cl sw l d)
-    pinFigS = car(createPolygon(cv "S" "ME2" "drawing" dint cl sw l d))
+    createPolygon(cv "S" "ME1" "drawing" d sl l dl)
+    pinFigS = car(createPolygon(cv "S" "ME2" "drawing" d sl l dl))
 
     createPin(cv "S" "inputOutput" pinFigS)
 
     if(mosType == "n" then
       ;; Creation of NPLUS
-      createRect(cv "NPLUS" "drawing" dint cl sw l d)
+      createRect(cv "NPLUS" "drawing" d cl sl l dl)
 
       ;; Design Bulk
-      pinFigB = car(createPolygon(cv "" "SYMBOL" "WELLBODY" dint cl sw l d))
+      pinFigB = car(createPolygon(cv "" "SYMBOL" "WELLBODY" d sl l dl))
 
       createPin(cv "B" "input" pinFigB)
     else
       ;; Creation of PPLUS 
-      createRect(cv "PPLUS" "drawing" dint cl sw l d)
+      createRect(cv "PPLUS" "drawing" d cl sl l dl)
     )
 
     ;; Design drain contacts
-    designDrainContacts(cv x y dint cl "CONT")
+    designDrainContacts(cv x y d cl "CONT")
 
     ;; Design diagonal drain contacts
-    designDrainContactsDiagonal(cv x y dint cl "CONT")
+    designDrainContactsDiagonal(cv x y d cl "CONT")
 
     ;; Design drain M2_M1 Vias
     if( l <= 0.485 then
-      designDrainVias(cv dint cl x y "VI1") 
+      designDrainVias(cv d cl x y "VI1") 
     )
 
     ;; Design diagonal drain M2_M1 Vias
-    designDrainViasDiagonal(cv dint cl x y "VI1")
+    designDrainViasDiagonal(cv d cl x y "VI1")
 
     ;; Design drain M3_M2 Vias
-    designDrainVias(cv dint cl x y "VI2") 
+    designDrainVias(cv d cl x y "VI2") 
 
     ;; Design diagonal drain M2_M1 Vias
-    designDrainViasDiagonal(cv dint cl x y "VI2")
+    designDrainViasDiagonal(cv d cl x y "VI2")
 
     ;; Design source contacts
-    designSourceContacts(cv l dint d cl x y "CONT")
+    designSourceContacts(cv l d dl cl x y "CONT")
 
     ;; Design diagonal source contacts
-    designSourceContactsDiagonal(cv l dint d cl x y "CONT")
+    designSourceContactsDiagonal(cv l d dl cl x y "CONT")
     
     ;; Design source M2_M1 Vias
-    designSourceVias(cv l dint d sw x y "VI1")
+    designSourceVias(cv l d dl sl x y "VI1")
     
     ;; Design diagonal source M2_M1 Vias
-    designSourceViasDiagonal(cv l cl dint d x y "VI1")
+    designSourceViasDiagonal(cv l cl d dl x y "VI1")
 
     ;; Creation of labels
-    ;designLabels(x y cv "TEXT" l dint cl sw) 
+    ;designLabels(x y cv "TEXT" l d cl sl) 
 
     ;; Creation of Guard Ring    
-    NPLUS_Length = dint+2*cl+2*l+2*sw+2*DIFFNPLUS_minSpacing 
-    NPLUS_Height = dint+2*cl+2*l+2*sw+DIFFNPLUS_minSpacing+PO1DIFF_minSpacing+VI1_Size+2*VI1ME1_minSpacing
+    NPLUS_Length = d+2*cl+2*l+2*sl+2*DIFFNPLUS_minSpacing 
+    NPLUS_Height = d+2*cl+2*l+2*sl+DIFFNPLUS_minSpacing+PO1DIFF_minSpacing+VI1_Size+2*VI1ME1_minSpacing
 
-    x = x-cl-l-sw-DIFFNPLUS_minSpacing
-    y = y+l+sw+PO1DIFF_minSpacing+VI1_Size+2*VI1ME1_minSpacing
+    x = x-cl-l-sl-DIFFNPLUS_minSpacing
+    y = y+l+sl+PO1DIFF_minSpacing+VI1_Size+2*VI1ME1_minSpacing
 
     CreateGR(cv x y NPLUS_Length NPLUS_Height mosType)
-
-    /*xPO1DIFF_Spacing = 0.24
-    dbCreatePolygon(cv list("NPLUS" "drawing") list((x-d-xPO1DIFF_Spacing-DIFFNPLUS_minSpacing:y+l+sw+DIFFNPLUS_minSpacing) (x+dint+d+xPO1DIFF_Spacing+DIFFNPLUS_minSpacing:y+l+sw+DIFFNPLUS_minSpacing) 
-    (x+dint+cl+l+sw+DIFFNPLUS_minSpacing:y-cl+d+xPO1DIFF_Spacing+DIFFNPLUS_minSpacing) (x+dint+cl+l+sw+DIFFNPLUS_minSpacing:y-cl-dint-d-xPO1DIFF_Spacing-DIFFNPLUS_minSpacing) 
-    (x+dint+d+xPO1DIFF_Spacing+DIFFNPLUS_minSpacing:y-2*cl-dint-l-sw-DIFFNPLUS_minSpacing) (x-d-xPO1DIFF_Spacing-DIFFNPLUS_minSpacing:y-2*cl-dint-l-sw-DIFFNPLUS_minSpacing) 
-    (x-cl-l-sw-DIFFNPLUS_minSpacing:y-cl-dint-d-xPO1DIFF_Spacing-DIFFNPLUS_minSpacing) (x-cl-l-sw-DIFFNPLUS_minSpacing:y-cl+d+xPO1DIFF_Spacing+DIFFNPLUS_minSpacing)))
-
-
-    PPLUS_Length = dint+2*d+2*xPO1DIFF_Spacing+2*DIFFNPLUS_minSpacing+2*NPLUSPPLUS_Spacing
-    DIFF_Length = dint+2*d+2*xPO1DIFF_Spacing+2*DIFFNPLUS_minSpacing+2*NPLUSPPLUS_Spacing+2*DIFFPPLUS_Spacing
-    GR_Diagonal_sides = (x+dint+cl+l+sw)-(x+dint+d+xPO1DIFF_Spacing)
-    diagonalSize = sqrt(2*(GR_Diagonal_sides*GR_Diagonal_sides))
-
-    x = x-d-xPO1DIFF_Spacing-DIFFNPLUS_minSpacing-NPLUSPPLUS_Spacing
-    y = y+l+sw+DIFFNPLUS_minSpacing+NPLUSPPLUS_Spacing
-
-    CreateGR_V2(cv x y PPLUS_Length DIFF_Length mosType GR_Diagonal_sides)
-    designGRContacts_V2(cv x y DIFF_Length)
-    designGRContactsDiagonal_V2(cv x y diagonalSize dint cl sw d xPO1DIFF_Spacing DIFFNPLUS_minSpacing DIFFPPLUS_Spacing NPLUSPPLUS_Spacing)*/
   )
 )
 
@@ -335,15 +253,14 @@ procedure(ELTdefinePC(libName cellName)
       (
         (model "string" "n_12_hsl130e")
         (w "string" "6u")
-        (l "string" "0.30u")
-        (dint "string" "0.75u")
-        (cl "string" "0.53u")
-        (d "string" "0.125u")
-        (sw "string" "0.36u")
+        (l "string" "0.2u")
+        (d "string" "1.12u")
+        (dl "string" "0.085u")
+        (sl "string" "0.36u")
       )
       let( ((cv pcCellView)) 
         getTechInfo(cv)
-        createLayout(cv model l dint d sw)
+        createLayout(cv model l d dl sl)
       )  
     )
   )
@@ -353,15 +270,14 @@ procedure(ELTdefinePC(libName cellName)
       (
         (model "string" "p_12_hsl130e")
         (w "string" "6u")
-        (l "string" "0.30u")
-        (dint "string" "0.75u")
-        (cl "string" "0.53u")
-        (d "string" "0.125u")
-        (sw "string" "0.36u")
+        (l "string" "0.2u")
+        (d "string" "1.12u")
+        (dl "string" "0.085u")
+        (sl "string" "0.36u")
       )
       let( ((cv pcCellView)) 
         getTechInfo(cv)
-        createLayout(cv model l dint d sw)
+        createLayout(cv model l d dl sl)
       )  
     )
   )

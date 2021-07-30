@@ -61,8 +61,8 @@ let( (cellId cdfId libName cellName)
       ?parseAsCEL     "yes"
     )
     cdfCreateParam( cdfId
-      ?name     "dint"
-      ?prompt   "dint"
+      ?name     "d"
+      ?prompt   "d"
       ?storeDefault "yes"
       ?units   "lengthMetric"
       ?defValue "0.75u"
@@ -73,20 +73,8 @@ let( (cellId cdfId libName cellName)
       ?parseAsCEL     "yes"
     )
     cdfCreateParam( cdfId
-      ?name     "cl"
-      ?prompt   "cl"
-      ?storeDefault "yes"
-      ?units   "lengthMetric"
-      ?defValue "0.53u"
-      ?type     "string"
-      ?display  "t"
-      ?editable "nil"
-      ?parseAsNumber  "yes"
-      ?parseAsCEL     "yes"
-    )
-    cdfCreateParam( cdfId
-      ?name     "d"
-      ?prompt   "d"
+      ?name     "dl"
+      ?prompt   "dl"
       ?storeDefault "yes"
       ?units   "lengthMetric"
       ?defValue "0.125u"
@@ -97,8 +85,8 @@ let( (cellId cdfId libName cellName)
       ?parseAsCEL     "yes"
     )
     cdfCreateParam( cdfId
-      ?name     "sw"
-      ?prompt   "Source Width (M)"
+      ?name     "sl"
+      ?prompt   "sl"
       ?storeDefault "yes"
       ?units   "lengthMetric"
       ?defValue "0.36u"
@@ -112,7 +100,7 @@ let( (cellId cdfId libName cellName)
     ;; Simulator Information
     cdfId->simInfo = list( nil )
     cdfId->simInfo->auCdl = '( nil
-      netlistProcedure  ansCdlSubcktCallExtended ;ansCdlCompPrim
+      netlistProcedure  ansCdlSubcktCallExtended
       instParameters    (l w)
       termOrder         (D G S B)
       propMapping       nil
@@ -121,7 +109,7 @@ let( (cellId cdfId libName cellName)
     )
 
     cdfId->simInfo->spectre = '( nil
-      termMapping       (nil D \:d G \:g S \:s B \:b)
+      termMapping       (nil D \:dl G \:g S \:s B \:b)
       instParameters    (w l m)
       otherParameters   (model)
       termOrder         (D G S B)
@@ -133,7 +121,7 @@ let( (cellId cdfId libName cellName)
       netlistProcedure  ansSpectreSDevPrim
       otherParameters   (model region)
       instParameters    (w l as ad ps pd m nf mis_flag trise)
-      termMapping       (nil D d G g S s B b)
+      termMapping       (nil D dl G g S s B b)
       namePrefix        M
       componentName     mos2
       current           port

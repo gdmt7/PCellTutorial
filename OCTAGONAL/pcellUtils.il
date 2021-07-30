@@ -16,39 +16,29 @@ CELL    = "pcellUtils"
 */
 
 procedure(calcWmethod()
-    let( (w l d dint cl alfa str) 
+    let( (w l dl d cl alfa str) 
         w = cdfParseFloatString(cdfgData->w->value)*1e6
         l = cdfParseFloatString(cdfgData->l->value)*1e6
+        dl = cdfParseFloatString(cdfgData->dl->value)*1e6
         d = cdfParseFloatString(cdfgData->d->value)*1e6
-        dint = cdfParseFloatString(cdfgData->dint->value)*1e6
-        cl = cdfParseFloatString(cdfgData->cl->value)*1e6
 
         alfa = 1.1780972451
-        dint = (w/8) - (l/tan(alfa))
-        cl = sqrt((dint*dint)/2)
+        d = (w/8) - (l/tan(alfa))
+        cl = snapGrid(sqrt(d*d/2) grid)
 
-        dint = snapGrid((round(dint*1000.0)/1000.0) grid) 
-        sprintf(str "%gu" dint)
-        cdfgData->dint->value = str
-
-        ;w = (dint*8) + ((l/tan(alfa))*8)
-
-        alfa = (22.5/180)*3.14
-        d = tan(alfa)*l
-        d = snapGrid((round(d*1000.0)/1000.0) grid)
-
-        cl = snapGrid((round(cl*1000.0)/1000.0) grid)
-        d = snapGrid((round(d*1000.0)/1000.0) grid)
-        w = snapGrid((round(w*1000.0)/1000.0) grid)
-
-        ;sprintf(str "%gu" dint)
-        ;cdfgData->dint->value = str
-
+        d = snapGrid((round(d*1000.0)/1000.0) grid) 
         sprintf(str "%gu" d)
         cdfgData->d->value = str
 
-        sprintf(str "%gu" cl)
-        cdfgData->cl->value = str
+        alfa = (22.5/180)*3.14
+        dl = tan(alfa)*l
+        dl = snapGrid((round(dl*1000.0)/1000.0) grid)
+
+        dl = snapGrid((round(dl*1000.0)/1000.0) grid)
+        w = snapGrid((round(w*1000.0)/1000.0) grid)
+
+        sprintf(str "%gu" dl)
+        cdfgData->dl->value = str
 
         sprintf(str "%gu" w)
         cdfgData->w->value = str
@@ -58,22 +48,18 @@ procedure(calcWmethod()
             cdfgData->l->value = str
             l = cdfParseFloatString(cdfgData->l->value)*1e6
             sprintf(str "%gu" 1.465)
-            cdfgData->dint->value = str
-            dint = cdfParseFloatString(cdfgData->dint->value)*1e6
+            cdfgData->d->value = str
+            d = cdfParseFloatString(cdfgData->d->value)*1e6
             sprintf(str "%gu" 1.035)
-            cdfgData->cl->value = str
-            cl = cdfParseFloatString(cdfgData->cl->value)*1e6
         )
         if( w < 6 then
             sprintf(str "%gu" 6)
             cdfgData->w->value = str
             w = cdfParseFloatString(cdfgData->w->value)*1e6
             sprintf(str "%gu" 1.465)
-            cdfgData->dint->value = str
-            dint = cdfParseFloatString(cdfgData->dint->value)*1e6
+            cdfgData->d->value = str
+            d = cdfParseFloatString(cdfgData->d->value)*1e6
             sprintf(str "%gu" 1.035)
-            cdfgData->cl->value = str
-            cl = cdfParseFloatString(cdfgData->cl->value)*1e6
         )*/
     )
 )
@@ -157,16 +143,16 @@ procedure(CreateSymbol(libName cellName)
   )
 )
 
-procedure(designLabels(xpos ypos cellviewId layer l dl cl sw)
+procedure(designLabels(xpos ypos cellviewId layer l dl cl sl)
     dbCreateLabel(cellviewId list(layer "drawing") xpos+(dl/2):ypos-(dl/2) "D" "centerCenter" "R0" "stick" 0.25)
-    dbCreateLabel(cellviewId list(layer "drawing") xpos+(dl/2):ypos+l+(sw/2) "S" "centerCenter" "R0" "stick" 0.25)
-    dbCreateLabel(cellviewId list(layer "drawing") xpos+(dl/2):ypos-dl-2*cl-l-(sw/2) "S" "centerCenter" "R0" "stick" 0.25)
-    dbCreateLabel(cellviewId list(layer "drawing") xpos+dl+cl+l+(sw/2):ypos-(dl/2) "S" "centerCenter" "R0" "stick" 0.25)
-    dbCreateLabel(cellviewId list(layer "drawing") xpos-cl-l-(sw/2):ypos-(dl/2) "S" "centerCenter" "R0" "stick" 0.25)
-    dbCreateLabel(cellviewId list(layer "drawing") xpos-cl-(l/2):ypos+l+sw+0.18+(0.32/2) "G" "centerCenter" "R0" "stick" 0.25)
+    dbCreateLabel(cellviewId list(layer "drawing") xpos+(dl/2):ypos+l+(sl/2) "S" "centerCenter" "R0" "stick" 0.25)
+    dbCreateLabel(cellviewId list(layer "drawing") xpos+(dl/2):ypos-dl-2*cl-l-(sl/2) "S" "centerCenter" "R0" "stick" 0.25)
+    dbCreateLabel(cellviewId list(layer "drawing") xpos+dl+cl+l+(sl/2):ypos-(dl/2) "S" "centerCenter" "R0" "stick" 0.25)
+    dbCreateLabel(cellviewId list(layer "drawing") xpos-cl-l-(sl/2):ypos-(dl/2) "S" "centerCenter" "R0" "stick" 0.25)
+    dbCreateLabel(cellviewId list(layer "drawing") xpos-cl-(l/2):ypos+l+sl+0.18+(0.32/2) "G" "centerCenter" "R0" "stick" 0.25)
 )
 
-procedure(designGateContacts(cvId x y l sw layer)
+procedure(designGateContacts(cvId x y l sl layer)
     let((tf viaDef viaParams newVia gatePinWidth)
         tf=techGetTechFile(cvId)
         viaDef=techFindViaDefByName(tf layer)
@@ -174,13 +160,11 @@ procedure(designGateContacts(cvId x y l sw layer)
         if( layer == "M1_POLY" then
             gatePinWidth = snapGrid((2*PO1CT_enclosure+CT_minSpacing+2*CT_Size) grid) 
             viaParams = list(list("cutRows" 1) list("cutColumns" 2))
-            ;newVia = dbCreateVia(cvId viaDef list(x-d-((gatePinWidth-PO1_minWidth)/2)+(gatePinWidth/2) y+l+sw+PO1DIFF_minSpacing+((CT_Size+2*PO1CT_enclosure)/2)) "R0" viaParams) 
-            newVia = dbCreateVia(cvId viaDef list(snapGrid((x-d-((gatePinWidth-0.16)/2)+(gatePinWidth/2)) grid) y+l+sw+PO1DIFF_minSpacing+((CT_Size+2*PO1CT_enclosure)/2)) "R0" viaParams) 
+            newVia = dbCreateVia(cvId viaDef list(snapGrid((x-dl-((gatePinWidth-0.16)/2)+(gatePinWidth/2)) grid) y+l+sl+PO1DIFF_minSpacing+((CT_Size+2*PO1CT_enclosure)/2)) "R0" viaParams) 
         else
             gatePinWidth = snapGrid((2*VI1ME1_minSpacing+VI1_minSpacing+2*VI1_Size) grid) 
             viaParams = list(list("cutRows" 1) list("cutColumns" 2))
-            ;newVia = dbCreateVia(cvId viaDef list(x-d-((gatePinWidth-PO1_minWidth)/2)+(gatePinWidth/2) y+l+sw+PO1DIFF_minSpacing+((VI1_Size+2*VI1ME1_minSpacing)/2)) "R0" viaParams) 
-            newVia = dbCreateVia(cvId viaDef list(snapGrid((x-d-((gatePinWidth-0.16)/2)+(gatePinWidth/2)) grid) y+l+sw+PO1DIFF_minSpacing+((VI1_Size+2*VI1ME1_minSpacing)/2)) "R0" viaParams) 
+            newVia = dbCreateVia(cvId viaDef list(snapGrid((x-dl-((gatePinWidth-0.16)/2)+(gatePinWidth/2)) grid) y+l+sl+PO1DIFF_minSpacing+((VI1_Size+2*VI1ME1_minSpacing)/2)) "R0" viaParams) 
         )
     )
 )
@@ -234,7 +218,7 @@ procedure(getContacts(width name)
         if( name == "drainVI1Diagonal" || name == "drainVI2Diagonal" then 
             nc = round((width/(VI1_diagonal+VI1_minDiagonal))) - 1
             spaceFilled = nc*VI1_diagonal+(nc-1)*VI1_minDiagonal
-            spaceLeft = dint - spaceFilled
+            spaceLeft = d - spaceFilled
             overSpace = snapGrid((spaceLeft/2) grid)
         )
         if( name == "sourceVI1Diagonal" || name == "sourceVI2Diagonal" then 
@@ -248,21 +232,13 @@ procedure(getContacts(width name)
     )  
 )
 
-procedure(designDrainContactsDiagonal(cvId xpos ypos dint cl layer)   
+procedure(designDrainContactsDiagonal(cvId xpos ypos d cl layer)   
     let( (yPO1CT_minSpacing nc overSpace overSpace_sides totalContacts)
-        
-        /*nc_d = round(((dint-2*CT_diagonal)/(CT_diagonal+CT_minDiagonal)))
-        spaceFilled = nc_d*CT_diagonal+(nc_d-1)*CT_minDiagonal
-        spaceLeft = dint - spaceFilled
-        overSpace = snapGrid((spaceLeft/2) grid)*/
 
         yPO1CT_minSpacing = 0.17
-        nc = car(getContacts(dint "drainDiagonal"))
-        overSpace = cadr(getContacts(dint "drainDiagonal"))
+        nc = car(getContacts(d "drainDiagonal"))
+        overSpace = cadr(getContacts(d "drainDiagonal"))
         overSpace_sides = snapGrid(sqrt((overSpace*overSpace)/2) grid)
-
-        ;xpos = xpos - overSpace_sides + CT_Size
-        ;ypos = ypos - overSpace_sides - yPO1CT_minSpacing
 
         xpos = xpos + CT_Size - (CT_Size/2) - overSpace_sides + 0.085
         ypos = ypos - (CT_Size/2) - overSpace_sides - 0.085
@@ -276,7 +252,7 @@ procedure(designDrainContactsDiagonal(cvId xpos ypos dint cl layer)
                     xpos = xpos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                     ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                 )
-                if(i == nc then xpos = 0 - cl + CT_Size + overSpace_sides + yPO1CT_minSpacing ypos = 0 - cl - dint  + CT_Size - overSpace_sides) 
+                if(i == nc then xpos = 0 - cl + CT_Size + overSpace_sides + yPO1CT_minSpacing ypos = 0 - cl - d  + CT_Size - overSpace_sides) 
             )
             if( i > nc && i <= 2*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos-CT_Size:ypos-CT_Size))
@@ -284,7 +260,7 @@ procedure(designDrainContactsDiagonal(cvId xpos ypos dint cl layer)
                     xpos = xpos + CT_Size + snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                     ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                 )
-                if(i == 2*nc then xpos = 0 + dint + overSpace_sides  ypos = 0 - overSpace_sides - yPO1CT_minSpacing)
+                if(i == 2*nc then xpos = 0 + d + overSpace_sides  ypos = 0 - overSpace_sides - yPO1CT_minSpacing)
             )
             if( i > 2*nc && i <= 3*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos-CT_Size:ypos-CT_Size))
@@ -292,7 +268,7 @@ procedure(designDrainContactsDiagonal(cvId xpos ypos dint cl layer)
                     xpos = xpos + CT_Size + snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                     ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                 )
-                if(i == 3*nc then xpos = 0 + dint + cl - overSpace_sides - CT_Size - yPO1CT_minSpacing  ypos = 0 - dint - cl - overSpace_sides + CT_Size)
+                if(i == 3*nc then xpos = 0 + d + cl - overSpace_sides - CT_Size - yPO1CT_minSpacing  ypos = 0 - d - cl - overSpace_sides + CT_Size)
             )
             if( i > 3*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))  
@@ -303,12 +279,12 @@ procedure(designDrainContactsDiagonal(cvId xpos ypos dint cl layer)
     )
 )
 
-procedure(designDrainContacts(cvId xpos ypos dint cl layer)   
+procedure(designDrainContacts(cvId xpos ypos d cl layer)   
     let( (nc overSpace_1 overSpace_2 totalContacts)
 
-        nc = car(getContacts(dint "drainHorizontal"))
-        overSpace_1 = cadr(getContacts(dint "drainHorizontal"))
-        overSpace_2 = snapGrid((dint - (nc*CT_Size+(nc-1)*CT_minSpacing)-overSpace_1) grid)
+        nc = car(getContacts(d "drainHorizontal"))
+        overSpace_1 = cadr(getContacts(d "drainHorizontal"))
+        overSpace_2 = snapGrid((d - (nc*CT_Size+(nc-1)*CT_minSpacing)-overSpace_1) grid)
 
         totalContacts = 4*nc
  
@@ -339,25 +315,17 @@ procedure(designDrainContacts(cvId xpos ypos dint cl layer)
     )
 )
 
-procedure(designSourceContactsDiagonal(cvId l dint d cl xpos ypos layer)
+procedure(designSourceContactsDiagonal(cvId l d dl cl xpos ypos layer)
     let((yPO1CT_minSpacing nc spaceFilled spaceLeft overSpace overSpace_sides totalContacts)
 
         yPO1CT_minSpacing = 0.165
-        sourceWidth = dint+2*d
+        sourceWidth = d+2*dl
 
         nc = car(getContacts(sourceWidth "sourceDiagonal"))
         overSpace = cadr(getContacts(sourceWidth "sourceDiagonal"))
         overSpace_sides = snapGrid(sqrt((overSpace*overSpace)/2) grid)
-        
-        /*nc = round(((sourceWidth-CT_diagonal)/(CT_diagonal+CT_minDiagonal)))
-        spaceFilled = nc*CT_diagonal+(nc-1)*CT_minDiagonal
-        spaceLeft = sourceWidth - spaceFilled
-        overSpace = snapGrid((spaceLeft/2) grid)*/
 
-        ;xpos = xpos - d - overSpace_sides - CT_Size - yPO1CT_minSpacing
-        ;ypos = ypos + l - overSpace_sides + yPO1CT_minSpacing
-
-        xpos = xpos - d - CT_Size - overSpace_sides - yPO1CT_minSpacing
+        xpos = xpos - dl - CT_Size - overSpace_sides - yPO1CT_minSpacing
         ypos = ypos + l - overSpace_sides + yPO1CT_minSpacing
 
         totalContacts = 4*nc
@@ -369,8 +337,7 @@ procedure(designSourceContactsDiagonal(cvId l dint d cl xpos ypos layer)
                     xpos = xpos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                     ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                 ) 
-                ;if(i == nc_d then xpos = 0 - d - CT_Size - sourceWidth_sides + overSpace_sides ypos = 0 + l - sourceWidth_sides - sourceWidth - overSpace_sides - yPO1CT_minSpacing)
-                if(i == nc then xpos = 0 - cl - l + overSpace_sides - yPO1CT_minSpacing  ypos = 0 - cl - dint - d - overSpace_sides - yPO1CT_minSpacing)
+                if(i == nc then xpos = 0 - cl - l + overSpace_sides - yPO1CT_minSpacing  ypos = 0 - cl - d - dl - overSpace_sides - yPO1CT_minSpacing)
             )
             if( i > nc && i <= 2*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
@@ -378,8 +345,7 @@ procedure(designSourceContactsDiagonal(cvId l dint d cl xpos ypos layer)
                     xpos = xpos + CT_Size + snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                     ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                 )
-                ;if( i == 2*nc_d then xpos = 0 + sourceWidth - d + overSpace_sides + yPO1CT_minSpacing ypos = 0 + l - overSpace_sides + CT_Size) 
-                if( i == 2*nc then xpos = 0 + dint + d + overSpace_sides + yPO1CT_minSpacing ypos = 0 + l - overSpace_sides + yPO1CT_minSpacing) 
+                if( i == 2*nc then xpos = 0 + d + dl + overSpace_sides + yPO1CT_minSpacing ypos = 0 + l - overSpace_sides + yPO1CT_minSpacing) 
             )
             if( i > 2*nc && i <= 3*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
@@ -387,8 +353,7 @@ procedure(designSourceContactsDiagonal(cvId l dint d cl xpos ypos layer)
                     xpos = xpos + CT_Size + snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                     ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
                 )
-                ;if( i == 3*nc_d then xpos = 0 + sourceWidth - d + sourceWidth_sides - overSpace_sides  ypos = 0 + l - sourceWidth_sides - sourceWidth - overSpace_sides - yPO1CT_minSpacing)
-                if( i == 3*nc then xpos = 0 + dint + cl + l - CT_Size - overSpace_sides + yPO1CT_minSpacing ypos = 0 - cl - dint - d - overSpace_sides - yPO1CT_minSpacing)
+                if( i == 3*nc then xpos = 0 + d + cl + l - CT_Size - overSpace_sides + yPO1CT_minSpacing ypos = 0 - cl - d - dl - overSpace_sides - yPO1CT_minSpacing)
             )
             if( i > 3*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
@@ -399,12 +364,11 @@ procedure(designSourceContactsDiagonal(cvId l dint d cl xpos ypos layer)
     )
 )
 
-procedure(designSourceContacts(cvId l dint d cl xpos ypos layer)
+procedure(designSourceContacts(cvId l d dl cl xpos ypos layer)
     let((xPO1CT_minSpacing sourceWidth nc totalContacts sourceWidth_sides overSpace_1 overSpace_2)   
 
-        sourceWidth = dint+2*d
+        sourceWidth = d+2*dl
         sourceWidth_sides = sqrt(sourceWidth*sourceWidth/2)
-        ;sourceWidth_sides = snapGrid(sqrt(sourceWidth*sourceWidth/2) grid)
 
         nc = car(getContacts(sourceWidth "sourceHorizontal"))
         overSpace_1 = cadr(getContacts(sourceWidth "sourceHorizontal"))
@@ -412,26 +376,20 @@ procedure(designSourceContacts(cvId l dint d cl xpos ypos layer)
 
         totalContacts = 4*nc
 
-        ;xpos = xpos - d - CT_Size - sourceWidth_sides - PO1CT_minSpacing
-        ;ypos = ypos + l - sourceWidth_sides - overSpace_1
-
         xpos = xpos - cl - l - CT_Size -  PO1CT_minSpacing
-        ypos = ypos - cl + d - overSpace_1
+        ypos = ypos - cl + dl - overSpace_1
 
         for( i 1 totalContacts
             if( i <= nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
                 if(i <= nc - 1 then ypos = ypos - CT_minSpacing - CT_Size)
-                ;if(i == nc then xpos = xpos + PO1CT_minSpacing + CT_Size + sourceWidth_sides + overSpace_1 ypos = ypos - overSpace_2 - CT_Size - sourceWidth_sides - PO1CT_minSpacing)
-                ;if(i == nc then xpos = xpos + PO1CT_minSpacing + CT_Size + l + 0.48 - d + overSpace_1 ypos = ypos - overSpace_1 - d)
-                if(i == nc then xpos = xpos + PO1CT_minSpacing + l + cl - d + CT_Size + overSpace_1 ypos = ypos - overSpace_2 + d - cl - CT_Size - l - PO1CT_minSpacing)
+                if(i == nc then xpos = xpos + PO1CT_minSpacing + l + cl - dl + CT_Size + overSpace_1 ypos = ypos - overSpace_2 + dl - cl - CT_Size - l - PO1CT_minSpacing)
             )
 
             if( i > nc && i <= 2*nc  then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))  
                 if(i <= 2*nc - 1 then xpos = xpos + CT_minSpacing + CT_Size)
-                ;if(i == 2*nc then xpos = xpos + CT_Size + overSpace_2 + sourceWidth_sides + PO1CT_minSpacing ypos = ypos + CT_Size + PO1CT_minSpacing + sourceWidth_sides + overSpace_1) 
-                if(i == 2*nc then xpos = xpos + overSpace_2 - d + cl + CT_Size + l + PO1CT_minSpacing ypos = ypos + PO1CT_minSpacing + l + cl - d + CT_Size + overSpace_1) 
+                if(i == 2*nc then xpos = xpos + overSpace_2 - dl + cl + CT_Size + l + PO1CT_minSpacing ypos = ypos + PO1CT_minSpacing + l + cl - dl + CT_Size + overSpace_1) 
             )
 
             if( i > 2*nc && i <= 3*nc then
@@ -444,15 +402,9 @@ procedure(designSourceContacts(cvId l dint d cl xpos ypos layer)
         sourceWidth = sourceWidth - 0.16 - xPO1CT_minSpacing ; -> 0.15 = min cont to poly para cumprir DRC com a diagonal
         nc = round(sourceWidth/(CT_Size+CT_minSpacing))
         overSpace_1 = snapGrid((sourceWidth - (nc*CT_Size+(nc-1)*CT_minSpacing)) grid)
-        /*if( overSpace_1 == 0.37 then
-            nc = nc + 1
-            overSpace_1 = snapGrid((sourceWidth - (nc*CT_Size+(nc-1)*CT_minSpacing)) grid)
-        )*/
 
-        ;xpos = xpos - PO1CT_minSpacing - sourceWidth_sides - snapGrid((overSpace_1/2) grid)
-
-        xpos = xpos - PO1CT_minSpacing - l - cl + d - overSpace_1
-        ypos = ypos + overSpace_2 + CT_Size - d + cl + l + PO1CT_minSpacing
+        xpos = xpos - PO1CT_minSpacing - l - cl + dl - overSpace_1
+        ypos = ypos + overSpace_2 + CT_Size - dl + cl + l + PO1CT_minSpacing
 
         for( i 1 nc
             dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos-CT_Size:ypos-CT_Size))
@@ -461,23 +413,15 @@ procedure(designSourceContacts(cvId l dint d cl xpos ypos layer)
     )
 )
 
-procedure(designDrainViasDiagonal(cvId dint cl xpos ypos layer)   
+procedure(designDrainViasDiagonal(cvId d cl xpos ypos layer)   
     let( (nc spaceFilled spaceLeft overSpace overSpace_sides totalContacts)
 
-        nc = car(getContacts(dint "drainVI1Diagonal"))
-        overSpace = cadr(getContacts(dint "drainVI1Diagonal"))
+        nc = car(getContacts(d "drainVI1Diagonal"))
+        overSpace = cadr(getContacts(d "drainVI1Diagonal"))
         overSpace_sides = snapGrid(sqrt((overSpace*overSpace)/2) grid)
-        
-        /*nc = round(((dint-VI1_diagonal)/(VI1_diagonal+VI1_minDiagonal)))
-        spaceFilled = nc*VI1_diagonal+(nc-1)*VI1_minDiagonal
-        spaceLeft = dint - spaceFilled
-        overSpace = snapGrid((spaceLeft/2) grid)*/
 
         xpos = xpos - (VI1_Size/2) - overSpace_sides + 0.03
         ypos = ypos - (VI1_Size/2) - overSpace_sides - 0.025
-
-        ;xpos = xpos - overSpace_sides
-        ;ypos = ypos - overSpace_sides - 0.13
 
         totalContacts = 4*nc
 
@@ -488,7 +432,7 @@ procedure(designDrainViasDiagonal(cvId dint cl xpos ypos layer)
                     xpos = xpos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                     ypos = ypos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                 )
-                if(i == nc then xpos = 0 - cl - (VI1_Size/2) + overSpace_sides + VI1_Size + 0.025 ypos = 0 - cl - dint + (VI1_Size/2) - overSpace_sides + 0.03) 
+                if(i == nc then xpos = 0 - cl - (VI1_Size/2) + overSpace_sides + VI1_Size + 0.025 ypos = 0 - cl - d + (VI1_Size/2) - overSpace_sides + 0.03) 
             )
             if( i > nc && i <= 2*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+VI1_Size:ypos-VI1_Size)) 
@@ -496,7 +440,7 @@ procedure(designDrainViasDiagonal(cvId dint cl xpos ypos layer)
                     xpos = xpos + VI1_Size + snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                     ypos = ypos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                 )
-                if(i == 2*nc then xpos = 0 + dint - (VI1_Size/2) + overSpace_sides - 0.03 ypos = 0 - overSpace_sides - (VI1_Size/2) - 0.025)
+                if(i == 2*nc then xpos = 0 + d - (VI1_Size/2) + overSpace_sides - 0.03 ypos = 0 - overSpace_sides - (VI1_Size/2) - 0.025)
             )
             if( i > 2*nc && i <= 3*nc then 
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+VI1_Size:ypos-VI1_Size))   
@@ -504,7 +448,7 @@ procedure(designDrainViasDiagonal(cvId dint cl xpos ypos layer)
                     xpos = xpos + VI1_Size + snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                     ypos = ypos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                 )
-                if(i == 3*nc then xpos = 0 + dint + cl - (VI1_Size/2) - overSpace_sides - VI1_Size - 0.025 ypos = 0 - dint - cl + (VI1_Size/2) - overSpace_sides + 0.03)
+                if(i == 3*nc then xpos = 0 + d + cl - (VI1_Size/2) - overSpace_sides - VI1_Size - 0.025 ypos = 0 - d - cl + (VI1_Size/2) - overSpace_sides + 0.03)
             )
             if( i > 3*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+VI1_Size:ypos-VI1_Size))   
@@ -515,13 +459,13 @@ procedure(designDrainViasDiagonal(cvId dint cl xpos ypos layer)
     )
 )
 
-procedure(designDrainVias(cvId dint cl xpos ypos layer)   
+procedure(designDrainVias(cvId d cl xpos ypos layer)   
     let( (nc overSpace_1 overSpace_2 totalContacts PO1VI1minSpacing)
 
         PO1VI1minSpacing = 0.08 
-        nc = car(getContacts(dint "drainVI1"))
-        overSpace_1 = cadr(getContacts(dint "drainVI1"))
-        overSpace_2 = snapGrid((dint - (nc*VI1_Size+(nc-1)*VI1_Size) - overSpace_1) grid)
+        nc = car(getContacts(d "drainVI1"))
+        overSpace_1 = cadr(getContacts(d "drainVI1"))
+        overSpace_2 = snapGrid((d - (nc*VI1_Size+(nc-1)*VI1_Size) - overSpace_1) grid)
 
         totalContacts = 4*nc
 
@@ -555,17 +499,17 @@ procedure(designDrainVias(cvId dint cl xpos ypos layer)
     )
 )
 
-procedure(designSourceViasDiagonal(cvId l cl dint d xpos ypos layer)
+procedure(designSourceViasDiagonal(cvId l cl d dl xpos ypos layer)
     let( (yPO1CT_minSpacing nc sourceWidth spaceFilled spaceLeft overSpace overSpace_sides totalContacts) 
        
         yPO1CT_minSpacing = 0.15
-        sourceWidth = dint + 2*d
+        sourceWidth = d + 2*dl
 
         nc = car(getContacts(sourceWidth "sourceVI1Diagonal"))
         overSpace = cadr(getContacts(sourceWidth "sourceVI1Diagonal"))
         overSpace_sides = snapGrid(sqrt((overSpace*overSpace)/2) grid)
 
-        xpos = xpos - d - VI1_Size - overSpace_sides - yPO1CT_minSpacing
+        xpos = xpos - dl - VI1_Size - overSpace_sides - yPO1CT_minSpacing
         ypos = ypos + l - overSpace_sides + yPO1CT_minSpacing
 
         totalContacts = 4*nc
@@ -577,7 +521,7 @@ procedure(designSourceViasDiagonal(cvId l cl dint d xpos ypos layer)
                     xpos = xpos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                     ypos = ypos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                 ) 
-                if(i == nc then xpos = 0 - cl - l + overSpace_sides - yPO1CT_minSpacing ypos = 0 - cl + d - sourceWidth - overSpace_sides - yPO1CT_minSpacing)
+                if(i == nc then xpos = 0 - cl - l + overSpace_sides - yPO1CT_minSpacing ypos = 0 - cl + dl - sourceWidth - overSpace_sides - yPO1CT_minSpacing)
             )
             if( i > nc && i <= 2*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+VI1_Size:ypos-VI1_Size))
@@ -585,7 +529,7 @@ procedure(designSourceViasDiagonal(cvId l cl dint d xpos ypos layer)
                     xpos = xpos + VI1_Size + snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                     ypos = ypos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                 )
-                if( i == 2*nc then xpos = 0 + dint + d + overSpace_sides + yPO1CT_minSpacing ypos = 0 + l - overSpace_sides + yPO1CT_minSpacing) 
+                if( i == 2*nc then xpos = 0 + d + dl + overSpace_sides + yPO1CT_minSpacing ypos = 0 + l - overSpace_sides + yPO1CT_minSpacing) 
             )
             if( i > 2*nc && i <= 3*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+VI1_Size:ypos-VI1_Size))
@@ -593,7 +537,7 @@ procedure(designSourceViasDiagonal(cvId l cl dint d xpos ypos layer)
                     xpos = xpos + VI1_Size + snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                     ypos = ypos - VI1_Size - snapGrid(sqrt((VI1_minDiagonal*VI1_minDiagonal)/2) grid)
                 )
-                if( i == 3*nc then xpos = 0 + dint + cl + l - VI1_Size - overSpace_sides + yPO1CT_minSpacing ypos = 0 - cl - dint - d - overSpace_sides - yPO1CT_minSpacing)
+                if( i == 3*nc then xpos = 0 + d + cl + l - VI1_Size - overSpace_sides + yPO1CT_minSpacing ypos = 0 - cl - d - dl - overSpace_sides - yPO1CT_minSpacing)
             )
             if( i > 3*nc then
                 dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+VI1_Size:ypos-VI1_Size))
@@ -604,11 +548,11 @@ procedure(designSourceViasDiagonal(cvId l cl dint d xpos ypos layer)
     )
 )
 
-procedure(designSourceVias(cvId l dint d sw xpos ypos layer)
+procedure(designSourceVias(cvId l d dl sl xpos ypos layer)
     let( (xPO1VI1_minSpacing PO1VI1minSpacing sourceWidth nc overSpace_1 overSpace_2 totalContacts sourceWidth_sides) 
     
         PO1VI1minSpacing = 0.08 
-        sourceWidth = dint + 2*d 
+        sourceWidth = d + 2*dl 
         sourceWidth_sides = snapGrid(sqrt(sourceWidth*sourceWidth/2) grid) 
 
         nc = car(getContacts(sourceWidth "sourceVI1"))
@@ -617,7 +561,7 @@ procedure(designSourceVias(cvId l dint d sw xpos ypos layer)
 
         totalContacts = 4*nc
 
-        xpos = xpos - d - sourceWidth_sides - VI1_Size - PO1VI1minSpacing
+        xpos = xpos - dl - sourceWidth_sides - VI1_Size - PO1VI1minSpacing
         ypos = ypos + l - sourceWidth_sides - overSpace_1
 
         for( i 1 totalContacts 
@@ -643,13 +587,9 @@ procedure(designSourceVias(cvId l dint d sw xpos ypos layer)
         sourceWidth = sourceWidth - 0.16 - xPO1VI1_minSpacing - 0.05; -> dar nome a esta varivel
         nc = round(sourceWidth/(2*VI1_Size))
         overSpace = snapGrid((sourceWidth - (nc*VI1_Size+(nc-1)*VI1_Size)) grid)
-        /*if( (nc*VI1_Size+(nc-1)*VI1_Size) > sourceWidth then
-            nc = nc - 1
-            overSpace = snapGrid((sourceWidth - (nc*VI1_Size+(nc-1)*VI1_Size)) grid)
-        )*/
 
-        xpos = xpos - sourceWidth_sides - ((sw - VI1_Size)/2) - VI1_Size - snapGrid((overSpace/2) grid)
-        ypos = ypos + overSpace_2 + sourceWidth_sides + VI1_Size + ((sw - VI1_Size)/2)
+        xpos = xpos - sourceWidth_sides - ((sl - VI1_Size)/2) - VI1_Size - snapGrid((overSpace/2) grid)
+        ypos = ypos + overSpace_2 + sourceWidth_sides + VI1_Size + ((sl - VI1_Size)/2)
 
         for( i 1 nc
             dbCreateRect(cvId list(layer "drawing") list(xpos:ypos xpos+VI1_Size:ypos-VI1_Size))  
@@ -725,10 +665,8 @@ procedure(CreateGR(cv xpos ypos NPLUS_Length NPLUS_Height mosType)
         DIFF_Width = CT_Size+2*CTDIFF_minSpacing
         
         DIFF_Length = NPLUS_Length + 2*DIFF_Width + 4*DIFFPPLUS_Spacing
-        ;DIFF_Height = NPLUS_Height + 2*DIFF_Width + 4*DIFFPPLUS_Spacing + 0.28
 
         DIFF_Height = NPLUS_Height + 2*DIFF_Width + 4*DIFFPPLUS_Spacing
-        ;DIFF_Height = NPLUS_Height + DIFFNPLUS_minSpacing + 0.16 + 0.16 + 0.28 + 0.18 + 0.32 + 0.16 + 0.16 + 0.28
 
         retList = getGRContacts(DIFF_Length DIFF_Height)
 
@@ -768,12 +706,6 @@ procedure(CreateGR(cv xpos ypos NPLUS_Length NPLUS_Height mosType)
             termB = dbCreateTerm(B "" "inputOutput")
             pinB = dbCreatePin(B pinFigB "Bulk")
         )
-        ;; Creation of outer PPLUS
-        ;dbCreateRect(cv list("PPLUS" "drawing") list((xpos-DIFFPPLUS_Spacing:ypos+DIFFPPLUS_Spacing) (xpos+DIFF_Length+DIFFPPLUS_Spacing:ypos-DIFF_Height-DIFFPPLUS_Spacing)))
-
-        ;; Creation of inner PPLUS
-        ;dbCreateRect(cv list("PPLUS" "drawing") list((xpos+DIFFPPLUS_Spacing+DIFF_Width:ypos-DIFFPPLUS_Spacing-DIFF_Width) (xpos+DIFF_Length-DIFFPPLUS_Spacing-DIFF_Width:ypos-DIFF_Height+DIFF_Width+DIFFPPLUS_Spacing)))
-
         ;; Creation of Diffusion and ME1 contact
         dbCreateRect(cv list("DIFF" "drawing") list((xpos:ypos) (xpos+DIFF_Length:ypos-DIFF_Width)))
         dbCreateRect(cv list("ME1" "drawing") list((xpos:ypos) (xpos+DIFF_Length:ypos-DIFF_Width)))
@@ -788,194 +720,5 @@ procedure(CreateGR(cv xpos ypos NPLUS_Length NPLUS_Height mosType)
         xpos = xpos + DIFF_Length
         dbCreateRect(cv list("DIFF" "drawing") list((xpos-DIFF_Width:ypos+DIFF_Width) (xpos:ypos+DIFF_Height-DIFF_Width)))
         dbCreateRect(cv list("ME1" "drawing") list((xpos-DIFF_Width:ypos+DIFF_Width) (xpos:ypos+DIFF_Height-DIFF_Width)))   
-    )
-)
-
-procedure(designGRContacts_V2(cv xpos ypos DIFF_Length)   
-    let((nc spaceLeft overSpace_1 overSpace_2 totalContacts) 
-
-        nc = round((DIFF_Length/(CT_Size+CT_minSpacing)))
-        spaceLeft = DIFF_Length - ((nc*CT_Size) + ((nc-1)*CT_minSpacing))
-        overSpace_1 = snapGrid((spaceLeft/2) grid)
-        overSpace_2 = snapGrid((DIFF_Length - (nc*CT_Size+(nc-1)*CT_minSpacing)-overSpace_1) grid)
-
-        xpos = xpos - DIFFPPLUS_Spacing + overSpace_1
-        ypos = ypos + DIFFPPLUS_Spacing + CTDIFF_minSpacing + CT_Size
-
-        totalContacts = 4*nc
-
-        for( i 1 totalContacts
-            if( i <= nc then
-                dbCreateRect(cv list("CONT" "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
-                if(i < nc then xpos = xpos + CT_minSpacing + CT_Size)
-                if(i == nc then xpos = xpos + GR_Diagonal_sides + overSpace_2 + CTDIFF_minSpacing + CT_Size ypos = ypos - GR_Diagonal_sides - CT_Size - CTDIFF_minSpacing - overSpace_1)
-            )
-
-            if( i > nc && i <= 2*nc then
-                dbCreateRect(cv list("CONT" "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
-                if(i <= 2*nc - 1 then  ypos = ypos - CT_minSpacing - CT_Size)
-                if(i == 2*nc then xpos = xpos - CTDIFF_minSpacing - CT_Size - GR_Diagonal_sides - overSpace_1 ypos = ypos - GR_Diagonal_sides - overSpace_2 - CT_Size - CTDIFF_minSpacing)          
-            )
-
-            if( i > 2*nc && i <= 3*nc then
-                dbCreateRect(cv list("CONT" "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
-                if(i <= 3*nc - 1 then xpos = xpos - CT_minSpacing - CT_Size)
-                if(i == 3*nc then xpos = xpos - overSpace_2 - GR_Diagonal_sides - CT_Size - CTDIFF_minSpacing ypos = ypos + CTDIFF_minSpacing + CT_Size + GR_Diagonal_sides + overSpace_1)
-            )
-
-            if( i > 3*nc then
-                dbCreateRect(cv list("CONT" "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))
-                ypos = ypos + CT_minSpacing + CT_Size
-            )
-        )
-    )
-)
-
-procedure(designGRContactsDiagonal_V2(cv xpos ypos diagonalSize dint cl sw d xPO1DIFF_Spacing DIFFNPLUS_minSpacing DIFFPPLUS_Spacing NPLUSPPLUS_Spacing)   
-    let((nc spaceFilled spaceLeft overSpace totalContacts) 
-
-        nc = round(diagonalSize/(CT_diagonal+CT_minDiagonal))
-        spaceFilled = nc*CT_diagonal+(nc-1)*CT_minDiagonal
-        spaceLeft = diagonalSize - spaceFilled
-        overSpace = snapGrid((spaceLeft/2) grid) 
-        overSpace_sides = snapGrid(sqrt((overSpace*overSpace)/2) grid)
-
-        xpos = xpos - 0.14 - overSpace_sides - CT_Size
-        ypos = ypos + DIFFPPLUS_Spacing + 0.14 - overSpace_sides
-
-        totalContacts = 4*nc
-
-        for( i 1 totalContacts
-            if( i <= nc then
-                dbCreateRect(cv list("CONT" "drawing") list(xpos:ypos xpos-CT_Size:ypos-CT_Size))
-                if(i <= nc - 1 then 
-                    xpos = xpos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-                    ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-                )
-                if(i == nc then 
-                    xpos = 0 - cl - l - sw - NPLUSPPLUS_Spacing - DIFFPPLUS_Spacing - 0.14 + overSpace_sides ypos = 0 - cl - dint - d - xPO1DIFF_Spacing - DIFFNPLUS_minSpacing - NPLUSPPLUS_Spacing - DIFFPPLUS_Spacing - 0.14 - overSpace_sides  
-                ) 
-            )
-            if( i > nc && i <= 2*nc then
-                dbCreateRect(cv list("CONT" "drawing") list(xpos:ypos xpos-CT_Size:ypos-CT_Size))
-                if(i <= 2*nc - 1 then 
-                    xpos = xpos + CT_Size + snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-                    ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-                )
-                if(i == 2*nc then xpos = 0 + dint + cl + l + sw + DIFFNPLUS_minSpacing + NPLUSPPLUS_Spacing + DIFFPPLUS_Spacing + 0.14 - overSpace_sides  ypos = 0 - cl - dint - d - xPO1DIFF_Spacing - DIFFNPLUS_minSpacing - NPLUSPPLUS_Spacing - DIFFPPLUS_Spacing - 0.14 - overSpace_sides)
-            )
-            if( i > 2*nc && i <= 3*nc then
-                dbCreateRect(cv list("CONT" "drawing") list(xpos:ypos xpos-CT_Size:ypos-CT_Size))
-                if(i <= 3*nc - 1 then
-                    xpos = xpos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-                    ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-                )
-                if(i == 3*nc then xpos = 0 + dint + d + xPO1DIFF_Spacing + DIFFNPLUS_minSpacing + NPLUSPPLUS_Spacing + DIFFPPLUS_Spacing + 0.14 + overSpace_sides ypos = 0 + l + sw + DIFFNPLUS_minSpacing + NPLUSPPLUS_Spacing + DIFFPPLUS_Spacing + 0.14 - overSpace_sides)
-            )
-            if( i > 3*nc then
-                dbCreateRect(cv list("CONT"  "drawing") list(xpos:ypos xpos+CT_Size:ypos-CT_Size))  
-                xpos = xpos + CT_Size + snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-                ypos = ypos - CT_Size - snapGrid(sqrt((CT_minDiagonal*CT_minDiagonal)/2) grid)
-            )
-        )
-    )
-)
-
-
-procedure(CreateGR_V2(cv xpos ypos PPLUS_Length DIFF_Length mosType GR_Diagonal_sides)
-    let((DIFF_Width)
-        DIFF_Width = CT_Size+2*CTDIFF_minSpacing
-
-        if(mosType == "n" then
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos+PPLUS_Length+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos+PPLUS_Length:ypos)))
-
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-
-            xpos = xpos - GR_Diagonal_sides
-            ypos = ypos - GR_Diagonal_sides
-
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-PPLUS_Length-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos:ypos-PPLUS_Length)))
-            
-            ypos = ypos - PPLUS_Length
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-
-            xpos = xpos + GR_Diagonal_sides
-            ypos = ypos - GR_Diagonal_sides
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+PPLUS_Length+2*DIFFPPLUS_Spacing+DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+PPLUS_Length:ypos)))
-            
-            xpos = xpos + PPLUS_Length
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
-
-            xpos = xpos + GR_Diagonal_sides
-            ypos = ypos + GR_Diagonal_sides
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+PPLUS_Length+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos:ypos+PPLUS_Length)))
-
-            ypos = ypos + PPLUS_Length
-            dbCreatePolygon(cv list("PPLUS" "drawing") list((xpos:ypos) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
-        else            
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos+PPLUS_Length+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos+PPLUS_Length:ypos)))
-
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-
-            xpos = xpos - GR_Diagonal_sides
-            ypos = ypos - GR_Diagonal_sides
-
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-PPLUS_Length-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos:ypos-PPLUS_Length)))
-            
-            ypos = ypos - PPLUS_Length
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-
-            xpos = xpos + GR_Diagonal_sides
-            ypos = ypos - GR_Diagonal_sides
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos-2*DIFFPPLUS_Spacing-DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+PPLUS_Length+2*DIFFPPLUS_Spacing+DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+PPLUS_Length:ypos)))
-            
-            xpos = xpos + PPLUS_Length
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+GR_Diagonal_sides-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
-
-            xpos = xpos + GR_Diagonal_sides
-            ypos = ypos + GR_Diagonal_sides
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos-2*DIFFPPLUS_Spacing-DIFF_Width) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+PPLUS_Length+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos:ypos+PPLUS_Length)))
-
-            ypos = ypos + PPLUS_Length
-            dbCreatePolygon(cv list("NPLUS" "drawing") list((xpos:ypos) (xpos+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width:ypos+GR_Diagonal_sides+2*DIFFPPLUS_Spacing+DIFF_Width) (xpos-GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
-        )
-
-
-        ;; Create Diffusion GuardRing
-        xpos = xpos - GR_Diagonal_sides - PPLUS_Length - DIFFPPLUS_Spacing
-        ypos = ypos + GR_Diagonal_sides + DIFFPPLUS_Spacing
-
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos+DIFF_Width) (xpos+DIFF_Length+DIFF_Width:ypos+DIFF_Width) (xpos+DIFF_Length:ypos)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos+DIFF_Width) (xpos+DIFF_Length+DIFF_Width:ypos+DIFF_Width) (xpos+DIFF_Length:ypos)))
-
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos+DIFF_Width) (xpos-GR_Diagonal_sides-DIFF_Width:ypos-GR_Diagonal_sides+DIFF_Width) (xpos-GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos+DIFF_Width) (xpos-GR_Diagonal_sides-DIFF_Width:ypos-GR_Diagonal_sides+DIFF_Width) (xpos-GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-
-        xpos = xpos - GR_Diagonal_sides
-        ypos = ypos - GR_Diagonal_sides
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos+DIFF_Width) (xpos-DIFF_Width:ypos-DIFF_Length-DIFF_Width) (xpos:ypos-DIFF_Length)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos+DIFF_Width) (xpos-DIFF_Width:ypos-DIFF_Length-DIFF_Width) (xpos:ypos-DIFF_Length)))
-
-        ypos = ypos - DIFF_Length
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos-DIFF_Width) (xpos+GR_Diagonal_sides-DIFF_Width:ypos-GR_Diagonal_sides-DIFF_Width) (xpos+GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos-DIFF_Width) (xpos+GR_Diagonal_sides-DIFF_Width:ypos-GR_Diagonal_sides-DIFF_Width) (xpos+GR_Diagonal_sides:ypos-GR_Diagonal_sides)))
-
-        xpos = xpos + GR_Diagonal_sides
-        ypos = ypos - GR_Diagonal_sides
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos-DIFF_Width) (xpos+DIFF_Length+DIFF_Width:ypos-DIFF_Width) (xpos+DIFF_Length:ypos)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos-DIFF_Width:ypos-DIFF_Width) (xpos+DIFF_Length+DIFF_Width:ypos-DIFF_Width) (xpos+DIFF_Length:ypos)))
-
-        xpos = xpos + DIFF_Length
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos+DIFF_Width:ypos-DIFF_Width) (xpos+GR_Diagonal_sides+DIFF_Width:ypos+GR_Diagonal_sides-DIFF_Width) (xpos+GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos+DIFF_Width:ypos-DIFF_Width) (xpos+GR_Diagonal_sides+DIFF_Width:ypos+GR_Diagonal_sides-DIFF_Width) (xpos+GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
-
-        xpos = xpos + GR_Diagonal_sides
-        ypos = ypos + GR_Diagonal_sides
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos+DIFF_Width:ypos-DIFF_Width) (xpos+DIFF_Width:ypos+DIFF_Length+DIFF_Width) (xpos:ypos+DIFF_Length)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos+DIFF_Width:ypos-DIFF_Width) (xpos+DIFF_Width:ypos+DIFF_Length+DIFF_Width) (xpos:ypos+DIFF_Length)))
-
-        ypos = ypos + DIFF_Length
-        dbCreatePolygon(cv list("DIFF" "drawing") list((xpos:ypos) (xpos+DIFF_Width:ypos+DIFF_Width) (xpos-GR_Diagonal_sides+DIFF_Width:ypos+GR_Diagonal_sides+DIFF_Width) (xpos-GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
-        dbCreatePolygon(cv list("ME1" "drawing") list((xpos:ypos) (xpos+DIFF_Width:ypos+DIFF_Width) (xpos-GR_Diagonal_sides+DIFF_Width:ypos+GR_Diagonal_sides+DIFF_Width) (xpos-GR_Diagonal_sides:ypos+GR_Diagonal_sides)))
     )
 )
