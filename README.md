@@ -8,7 +8,6 @@ Using a commercial technology of 130 nm from United Microelectronics Corporation
 
 * Cadence Virtuoso Design Environment
 * SKILL Language Programming
-* Visual Studio Code
 
 # How to run the Scripts:
 
